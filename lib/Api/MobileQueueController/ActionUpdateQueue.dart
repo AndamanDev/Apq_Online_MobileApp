@@ -43,6 +43,7 @@ class ActionUpdateQueue {
       debugPrint('StatusQueueNote type: ${statusQueueNote.runtimeType}');
       debugPrint('caller_id: ${service.callerId}');
       debugPrint('queue_id: ${service.queueId}');
+      debugPrint('queue_no: ${service.queueNo}');
       debugPrint('caller_id: ${service.callerId}');
       debugPrint('==========================================');
 

@@ -8,6 +8,7 @@ class ModelsQueueBinding {
   final int serviceId;
   final int numberPax;
   final DateTime? createAt;
+  final int? callerId;
 
   ModelsServiceQueueBinding? service;
 
@@ -18,6 +19,7 @@ class ModelsQueueBinding {
     required this.serviceId,
     required this.numberPax,
     required this.createAt,
+    required this.callerId,
      this.service,
   });
 
@@ -29,6 +31,7 @@ class ModelsQueueBinding {
       serviceId: JsonHelper.toInt(json['service_id']) ?? 0,
       numberPax: JsonHelper.toInt(json['number_pax']) ?? 0,
       createAt: JsonHelper.parseDateTime(json['created_at'])!,
+      callerId: JsonHelper.toInt(json['caller_id']),
     );
   }
 }

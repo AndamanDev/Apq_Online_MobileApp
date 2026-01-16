@@ -89,6 +89,8 @@ class CallTab extends StatelessWidget {
                               service: item,
                               statusQueue: 'Finishing',
                               statusQueueNote: '1',
+                              statustabs: '', 
+                              callerme: null,
                             )
                           : null,
                     ),
@@ -97,7 +99,7 @@ class CallTab extends StatelessWidget {
                       label: 'OTHERS',
                       color: AppColors.orange,
                       onPressed: isCurrentQueueMatch
-                          ? () => ClassOthersDialog.show(context, item, "1")
+                          ? () => ClassOthersDialog.show(context, item, null , "1")
                           : null,
                     ),
                     _gap(),
@@ -110,6 +112,8 @@ class CallTab extends StatelessWidget {
                                 service: item,
                                 statusQueue: 'Recalling',
                                 statusQueueNote: '',
+                                statustabs: '',
+                                callerme: null,
                               )
                             : await context.read<ProviderQueue>().callQueue(
                                 service: item,

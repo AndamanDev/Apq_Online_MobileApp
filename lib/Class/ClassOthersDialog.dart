@@ -1,4 +1,5 @@
 import 'package:apq_m1/Class/ClassObject.dart';
+import 'package:apq_m1/Models/ModelsQueueBinding.dart';
 import 'package:apq_m1/Models/ModelsServiceQueueBinding.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -21,6 +22,7 @@ class ClassOthersDialog {
   static Future<Map<String, dynamic>?> show(
     BuildContext context,
     ModelsServiceQueueBinding item,
+    ModelsQueueBinding? itemqueue,
     String statustabs,
   ) {
     final filteredReasons = reasons.where((r) {
@@ -49,14 +51,18 @@ class ClassOthersDialog {
               ),
               const SizedBox(height: 5),
               Text(
-                "${item.queueNo}",
+                statustabs == "1" ? "${item.callerQueueNo}" : "${item.queueNo}",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
-                     Text(
-                "${item.callerId}",
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
+              //        Text(
+              //   "${item.callerId}" "${itemqueue?.callerId}",
+              //   style: TextStyle(fontWeight: FontWeight.bold),
+              // ),
+              //        Text(
+              //   "${item.callerQueueNo}"  "${item.queueNo}",
+              //   style: TextStyle(fontWeight: FontWeight.bold),
+              // ),
+              // const SizedBox(height: 10),
 
               ...List.generate(filteredReasons.length, (index) {
                 final reason = filteredReasons[index];
@@ -74,6 +80,8 @@ class ClassOthersDialog {
                             service: item,
                             statusQueue: 'Holding',
                             statusQueueNote: '',
+                            statustabs: statustabs,
+                            callerme: itemqueue?.callerId,
                           );
                         } else if (reasonId != '') {
                           var ReasonNote = (reasonId == 1)
@@ -83,6 +91,8 @@ class ClassOthersDialog {
                             service: item,
                             statusQueueNote: reasonId.toString(),
                             statusQueue: ReasonNote,
+                            statustabs: statustabs,
+                            callerme: itemqueue?.callerId,
                           );
                         }
                       },

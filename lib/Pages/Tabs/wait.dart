@@ -39,9 +39,8 @@ class _WaitTabState extends State<WaitTab> {
     final serviceList = queue.serviceList;
     final waitingQueueList = queue.waitingQueueList;
 
-    if (queue.loading) {
-      return const Center(child: CircularProgressIndicator());
-    }
+
+    if (queue.loading) {}
 
     if (queue.waitingQueueList.isEmpty) {
       return const Center(
@@ -130,7 +129,8 @@ class _WaitTabState extends State<WaitTab> {
                                 item,
                                 queue.serviceList,
                               ),
-                              "2"
+                              item,
+                              "2",
                             );
                           },
                           style: ElevatedButton.styleFrom(

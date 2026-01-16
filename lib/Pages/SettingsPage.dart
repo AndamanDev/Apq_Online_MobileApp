@@ -4,6 +4,8 @@ import 'package:apq_m1/main.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../Provider/ProviderAuth.dart';
+import '../Provider/ProviderLanguage.dart';
+import '../localization/app_localizations.dart';
 import 'InitPage.dart';
 import 'Setting/SettingPrinter.dart';
 
@@ -17,20 +19,65 @@ class SettingPage extends StatefulWidget {
 class _SettingPageState extends State<SettingPage> {
   @override
   Widget build(BuildContext context) {
+    final currentLang = context.watch<ProviderLanguage>().locale.languageCode;
+
     return Scaffold(
       appBar: AppBar(title: const Text("Settings")),
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
           children: [
-            // เนื้อหา scroll ได้
+            /// 🔤 ปุ่มเปลี่ยนภาษา (อยู่บน)
+            // Row(
+            //   children: [
+            //     Expanded(
+            //       child: ElevatedButton(
+            //         style: ElevatedButton.styleFrom(
+            //           backgroundColor: currentLang == 'en'
+            //               ? Colors.blue
+            //               : Colors.grey[300],
+            //           foregroundColor: currentLang == 'en'
+            //               ? Colors.white
+            //               : Colors.black,
+            //         ),
+            //         onPressed: () {
+            //           context.read<ProviderLanguage>().changeLanguage('en');
+            //         },
+            //         child: const Text('English'),
+            //       ),
+            //     ),
+            //     const SizedBox(width: 12),
+            //     Expanded(
+            //       child: ElevatedButton(
+            //         style: ElevatedButton.styleFrom(
+            //           backgroundColor: currentLang == 'th'
+            //               ? Colors.blue
+            //               : Colors.grey[300],
+            //           foregroundColor: currentLang == 'th'
+            //               ? Colors.white
+            //               : Colors.black,
+            //         ),
+            //         onPressed: () {
+            //           context.read<ProviderLanguage>().changeLanguage('th');
+            //         },
+            //         child: const Text('ไทย'),
+            //       ),
+            //     ),
+            //   ],
+            // ),
+
+            // const SizedBox(height: 16),
+
+            /// 📜 เนื้อหาที่เลื่อน
             Expanded(
               child: ListView(
                 children: const [Settingprinter(), Settingnode()],
               ),
             ),
+
             const SizedBox(height: 24),
 
+            /// 🔴 Logout
             ElevatedButton(
               onPressed: () async {
                 final bool? confirm = await showDialog<bool>(
@@ -41,55 +88,28 @@ class _SettingPageState extends State<SettingPage> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      title: Row(
-                        children: const [
-                          Icon(
-                            Icons.warning_amber_rounded,
-                            color: Colors.red,
-                            size: 28,
-                          ),
-                          // SizedBox(width: 8),
-                          // Text(
-                          //   'ยืนยันการออกจากระบบ',
-                          //   style: TextStyle(fontWeight: FontWeight.bold),
-                          // ),
-                        ],
+                      title: const Icon(
+                        Icons.warning_amber_rounded,
+                        color: Colors.red,
+                        size: 28,
                       ),
                       content: const Text(
-                        'คุณต้องการออกจากระบบใช่หรือไม่?\n\n'
-                        'คุณจะต้องเข้าสู่ระบบใหม่อีกครั้ง',
-                        style: TextStyle(fontSize: 15),
-                      ),
-                      actionsPadding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
+                        'Do you want to log out??\n'
+                        'You will need to log in again.',
                       ),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.of(ctx).pop(false),
-                          child: const Text(
-                            'ยกเลิก',
-                            style: TextStyle(color: Colors.grey),
-                          ),
+                          child: const Text('Cancel'),
                         ),
                         ElevatedButton(
+                          onPressed: () => Navigator.of(ctx).pop(true),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.red,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 20,
-                              vertical: 10,
-                            ),
                           ),
-                          onPressed: () => Navigator.of(ctx).pop(true),
                           child: const Text(
-                            'ออกจากระบบ',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
+                            'Logout',
+                            style: TextStyle(color: Colors.white),
                           ),
                         ),
                       ],
@@ -109,13 +129,11 @@ class _SettingPageState extends State<SettingPage> {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
                 minimumSize: const Size.fromHeight(50),
-                padding: const EdgeInsets.all(12),
               ),
-              child: const Text(
-                "LOGOUT",
-                style: TextStyle(fontWeight: FontWeight.bold),
+              child: Text(
+                AppLocalizations.of(context).translate('Logout'),
+                style: const TextStyle(fontWeight: FontWeight.bold , color: AppColors.white),
               ),
             ),
           ],

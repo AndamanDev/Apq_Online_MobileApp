@@ -130,7 +130,8 @@ class _HoldTabState extends State<HoldTab> {
                                 item,
                                 queue.serviceList,
                               ),
-                              "3"
+                              item,
+                              "3",
                             );
                           },
                           style: ElevatedButton.styleFrom(
@@ -159,8 +160,12 @@ class _HoldTabState extends State<HoldTab> {
                               queue.serviceList,
                             );
 
-                            await context.read<ProviderQueue>().callQueue(
+                            context.read<ProviderQueue>().updateQueue(
                               service: service,
+                              statusQueue: 'Calling',
+                              statusQueueNote: '',
+                              callerme: item.callerId,
+                              statustabs: "3",
                             );
                           },
                           style: ElevatedButton.styleFrom(

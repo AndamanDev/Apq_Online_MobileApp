@@ -1,3 +1,4 @@
+import 'package:apq_m1/Provider/ProviderLanguage.dart';
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,8 @@ import 'Class/Global.dart';
 import 'Pages/InitPage.dart';
 import 'Provider/ProviderAuth.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'localization/app_localizations_delegate.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,10 +35,14 @@ void main() async {
   //     ),
   //   ),
   // );
+
   runApp(
     ToastificationWrapper(
       child: MultiProvider(
-        providers: [ChangeNotifierProvider(create: (_) => authProvider)],
+        providers: [
+          ChangeNotifierProvider<ProviderAuth>.value(value: authProvider),
+          ChangeNotifierProvider(create: (_) => ProviderLanguage()),
+        ],
         child: const MyApp(),
       ),
     ),
@@ -63,28 +70,40 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      useInheritedMediaQuery: true,
-      locale: DevicePreview.locale(context),
-      builder: DevicePreview.appBuilder,
+    return Consumer<ProviderLanguage>(
+      builder: (context, lang, _) {
+        return MaterialApp(
+          locale: lang.locale,
+          supportedLocales: const [Locale('th'), Locale('en')],
+          localizationsDelegates: const [
+            AppLocalizationsDelegate(),
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
 
-      theme: ThemeData(
-        scaffoldBackgroundColor: AppColors.primary,
-        primaryColor: AppColors.primary,
-        appBarTheme: const AppBarTheme(
-          backgroundColor: AppColors.primary,
-          foregroundColor: AppColors.white,
-        ),
+          useInheritedMediaQuery: true,
+          // locale: DevicePreview.locale(context),
+          // builder: DevicePreview.appBuilder,
+          theme: ThemeData(
+            scaffoldBackgroundColor: AppColors.primary,
+            primaryColor: AppColors.primary,
+            appBarTheme: const AppBarTheme(
+              backgroundColor: AppColors.primary,
+              foregroundColor: AppColors.white,
+            ),
 
-        textTheme: responsiveTextTheme(context),
-      ),
+            textTheme: responsiveTextTheme(context),
+          ),
 
-      darkTheme: ThemeData(
-        scaffoldBackgroundColor: AppColors.background,
-        primaryColor: AppColors.primary,
-      ),
-      scaffoldMessengerKey: rootMessengerKey,
-      home: const InitPage(),
+          darkTheme: ThemeData(
+            scaffoldBackgroundColor: AppColors.background,
+            primaryColor: AppColors.primary,
+          ),
+          scaffoldMessengerKey: rootMessengerKey,
+          home: const InitPage(),
+        );
+      },
     );
   }
 

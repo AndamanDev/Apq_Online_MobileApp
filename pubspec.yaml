@@ -52,9 +52,12 @@ dependencies:
   toastification: ^3.0.3
   flutter_native_splash: ^2.4.7
   flutter_launcher_icons: ^0.14.4
+  flutter_localization: ^0.3.3
 
 dev_dependencies:
   flutter_test:
+    sdk: flutter
+  flutter_localizations:
     sdk: flutter
 
   # The "flutter_lints" package below contains a set of recommended lints to
@@ -78,6 +81,7 @@ flutter_native_splash:
   image: assets/logo/apqueue_logo_green.png
 # The following section is specific to Flutter packages.
 flutter:
+  generate: true
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -85,6 +89,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - assets/lang/
     - assets/mylogo.jpg
     - assets/logo/
     - assets/logo/apqueue_logo2.png

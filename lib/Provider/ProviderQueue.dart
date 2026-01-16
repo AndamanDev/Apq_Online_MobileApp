@@ -6,7 +6,7 @@ import '../Api/MobileQueueController/ActionCreateQueue.dart';
 import '../Api/MobileQueueController/ActionQueueBinding.dart';
 import '../Api/MobileQueueController/ActionServiceQueueBinding.dart';
 import '../Api/MobileQueueController/ActionUpdateQueue.dart';
-import '../Api/MobileQueueController/ActionUpdateQueueTabsHold.dart';
+import '../Api/MobileQueueController/ActionUpdateQueueTabs23.dart';
 import '../Class/ClassSocket.dart';
 import '../Class/ClassToast.dart';
 import '../Models/ModelsQueueBinding.dart';
@@ -139,20 +139,27 @@ class ProviderQueue extends ChangeNotifier {
     required ModelsServiceQueueBinding service,
     required String statusQueue,
     required String statusQueueNote,
+    required String statustabs, 
+    required int? callerme,
   }) async {
     try {
+      print(callerme);
 
-        await ActionUpdateQueueTabsHold(
-        service: service,
-        statusQueue: statusQueue,
-        statusQueueNote: statusQueueNote,
-      ).updateQueue();
-
-      // await ActionUpdateQueue(
-      //   service: service,
-      //   statusQueue: statusQueue,
-      //   statusQueueNote: statusQueueNote,
-      // ).updateQueue();
+      if (statustabs == '2' || statustabs == '3') {
+        await ActionUpdateQueueTabs23(
+          service: service,
+          statusQueue: statusQueue,
+          statusQueueNote: statusQueueNote,
+          statustabs:statustabs,
+          callerme: callerme ,
+        ).updateQueue();
+      } else {
+        await ActionUpdateQueue(
+          service: service,
+          statusQueue: statusQueue,
+          statusQueueNote: statusQueueNote,
+        ).updateQueue();
+      }
 
       final services = await ActionServiceQueueBinding(branchId: branchId);
       final updated = services.firstWhere(
@@ -161,9 +168,11 @@ class ProviderQueue extends ChangeNotifier {
       _updateService(updated);
       ClassToast.success("อัพเดตคิว ${updated.callerQueueNo ?? ''} สำเร็จ");
       await loadQueuesOnly();
-      // await ClassSocket().updateQueue(updated, statusQueue, statusQueueNote);
+      await ClassSocket().updateQueue(updated, statusQueue, statusQueueNote);
     } catch (e) {
-      ClassToast.error("อัพเดตคิวล้มเหลว");
+      await loadQueuesOnly();
+      ClassToast.error("อัพเดตคิวล้มเหลว เนื่องจากมีคิวกำลังเรียกอยู่");
+      // await load();
     }
   }
 
