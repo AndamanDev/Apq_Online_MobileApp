@@ -1,6 +1,7 @@
 import 'package:apq_m1/Models/ModelsServiceQueueBinding.dart'
     show ModelsServiceQueueBinding;
 import 'package:socket_io_client/socket_io_client.dart' as IO;
+import '../Api/ApiConfig.dart';
 import '../Models/ModelsQueueBinding.dart';
 
 class ClassSocket {
@@ -16,9 +17,11 @@ class ClassSocket {
     }
   }
 
+  final uri = Uri.parse(ApiConfig.baseUrl);
+
   void _connect() {
     _socket = IO.io(
-      'https://apq.andamandev.com',
+      uri.toString(),
       IO.OptionBuilder()
           .setTransports(['websocket'])
           .setPath('/nodeapq/socket.io')
@@ -49,11 +52,13 @@ class ClassSocket {
   Future<void> callQueue(ModelsServiceQueueBinding queue, int callerId) async {
     await initializeWebSocket();
 
-    const toSocket = 'queue:call';
-    
-    print(callerId);
-    _socket?.emit(toSocket, {'data': callerId , 'action': 'call' , 'branch': queue.branchId,});
+    const ToSocket = 'queue:call';
 
+   _socket?.emit(ToSocket, <String, dynamic>{
+      'data': callerId,
+      'queue': 'call',
+      'branch': queue.branchId,
+    });
   }
 
   Future<void> updateQueue(
@@ -85,26 +90,9 @@ class ClassSocket {
     _socket?.emit(ToSocket, <String, dynamic>{
       'queue': ToSocket,
       'data': queue.callerId,
+      'branch': queue.branchId,
     });
 
-    const toSocket = 'queue:call';
-
-    _socket?.emit(toSocket, {'data': queue.callerId, 'action': 'call'});
-
-  }
-
-  Future<void> recallQueue(ModelsQueueBinding queue) async {
-    await initializeWebSocket();
-
-    const toSocket = 'queue:call';
-
-    _socket?.emit(toSocket, {
-      'queue': queue.queueNo,
-      'serviceId': queue.serviceId,
-      'action': 'recall',
-    });
-
-    print('RECALL QUEUE: ${queue.queueNo}');
   }
 
   Future<void> createQueue(ModelsServiceQueueBinding queue) async {
@@ -117,7 +105,5 @@ class ClassSocket {
       'serviceId': queue.serviceId,
       'action': 'create queue',
     });
-
-    print('CREATECALL QUEUE: ${queue.queueNo}');
   }
 }

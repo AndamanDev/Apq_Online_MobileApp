@@ -1,17 +1,16 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../../Models/ModelsServiceQueueBinding.dart';
 import '../ApiConfig.dart';
 
 class ActionReCallQueue {
-  final BuildContext context;
   final ModelsServiceQueueBinding serviceDetail;
 
-  ActionReCallQueue({required this.context, required this.serviceDetail});
+  ActionReCallQueue({required this.serviceDetail});
 
   Future<void> CallQueue() async {
-    final uri = Uri.parse(ApiConfig.recallQueue(context),);
+    final uri = Uri.parse(ApiConfig.recallQueue);
 
     final body = {
       'ServiceDetail': {

@@ -5,11 +5,10 @@ import '../../Models/ModelsBranchSearch.dart';
 import '../ApiConfig.dart';
 
 Future<List<Modelsbranchsearch>> ActionBranchsearch({
-  required BuildContext context,
   required dynamic branchid,
 }) async {
   final uri = Uri.parse(
-    ApiConfig.BranchSearch(context),
+    ApiConfig.branchSearch,
   ).replace(queryParameters: {'bid': branchid.toString()});
 
   try {

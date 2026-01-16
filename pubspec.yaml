@@ -45,6 +45,13 @@ dependencies:
   image: ^4.7.2
   permission_handler: ^12.0.1
   flutter_esc_pos_utils: ^1.0.1
+  shared_preferences: ^2.5.4
+  charset_converter: ^2.3.0
+  qr_flutter: ^4.1.0
+  awesome_dialog: ^3.3.0
+  toastification: ^3.0.3
+  flutter_native_splash: ^2.4.7
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -59,10 +66,18 @@ dev_dependencies:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/logo/apqueue_logo.png
 
+flutter_native_splash:
+  color: "#ffffff"
+  android: true
+  ios: true
+  image: assets/logo/apqueue_logo_green.png
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

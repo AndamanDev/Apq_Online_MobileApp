@@ -96,7 +96,7 @@ class Widgetnumpad extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  onPressed: onSubmit,
+                  onPressed: currentValue.isEmpty ? null : onSubmit,
                   child: Text(
                     submitText,
                     style: const TextStyle(fontSize: 20, color: Colors.white),

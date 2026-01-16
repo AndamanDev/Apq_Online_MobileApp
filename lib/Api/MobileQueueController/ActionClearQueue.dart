@@ -5,11 +5,10 @@ import 'package:http/http.dart' as http;
 import '../ApiConfig.dart';
 
 Future<void> ActionClearqueue({
-  required BuildContext context,
   required int branchId,
 }) async {
   final uri = Uri.parse(
-    ApiConfig.claerQueue(context),
+    ApiConfig.clearQueue,
   ).replace(queryParameters: {'branchid': branchId.toString()});
 
   try {

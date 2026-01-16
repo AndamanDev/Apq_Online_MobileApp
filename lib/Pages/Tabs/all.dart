@@ -1,11 +1,17 @@
 import 'dart:async';
+import 'dart:convert';
+import 'package:apq_m1/Class/ClassReTicket.dart';
 import 'package:intl/intl.dart';
 import 'package:apq_m1/Class/ClassObject.dart';
 import 'package:flutter/material.dart';
+import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 import 'package:provider/provider.dart';
 import '../../Class/ClassJsonHelper.dart';
 import '../../Class/ClassOthersDialog.dart';
+import '../../Class/ClassTicket.dart';
+import '../../Class/ClassToast.dart';
 import '../../Models/ModelsServiceQueueBinding.dart';
+import '../../Models/ModeslQueueWithService.dart';
 import '../../Provider/ProviderQueue.dart';
 
 class AllTab extends StatefulWidget {
@@ -45,7 +51,10 @@ class _AllTabState extends State<AllTab> {
 
     if (queue.allingQueueList.isEmpty) {
       return const Center(
-        child: Text('ไม่มีคิวในวันนี้', style: TextStyle(color: AppColors.white)),
+        child: Text(
+          'ไม่มีคิวในวันนี้',
+          style: TextStyle(color: AppColors.white),
+        ),
       );
     }
 
@@ -71,14 +80,11 @@ class _AllTabState extends State<AllTab> {
                       /// Queue No
                       Text(
                         item.queueNo.toString(),
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
 
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 1),
 
                       Row(
                         children: [
@@ -91,23 +97,8 @@ class _AllTabState extends State<AllTab> {
                             value: DateFormat('HH:mm').format(item.createAt!),
                           ),
                           _infoItem(
-                            title: "Wait Time",
-                            valueWidget: StreamBuilder<DateTime>(
-                              stream: Stream.periodic(
-                                const Duration(seconds: 30),
-                                (_) => DateTime.now(),
-                              ),
-                              builder: (context, snapshot) {
-                                return Text(
-                                  JsonHelper.formatWaitTime(item.createAt),
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                );
-                              },
-                            ),
+                            title: "Stataus",
+                            value: "${item.servicestatusName}",
                           ),
                         ],
                       ),
@@ -121,7 +112,50 @@ class _AllTabState extends State<AllTab> {
                   flex: 2,
                   child: Column(
                     children: [
-                    
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            final status =
+                                await PrintBluetoothThermal.connectionStatus;
+                            if (!status) {
+                              ClassToast.error("Printer not connected");
+                              return;
+                            }
+
+                            final service = ModelsServiceQueueBinding.fromQueue(
+                              item,
+                              context.read<ProviderQueue>().serviceList,
+                            );
+
+                            final data = QueueWithService(
+                              queue: item,
+                              service: service,
+                            );
+
+                            ClassToast.success("Reprint เรียบร้อย");
+
+                            final ticket = await Classreticket()
+                                .reprintQueueTicket(data);
+
+                            await PrintBluetoothThermal.writeBytes(ticket);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.green,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: const Text(
+                            "REPRINT",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ),

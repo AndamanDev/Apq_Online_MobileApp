@@ -68,7 +68,6 @@ class _HoldTabState extends State<HoldTab> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      /// Queue No
                       Text(
                         item.queueNo.toString(),
                         style: const TextStyle(
@@ -99,7 +98,7 @@ class _HoldTabState extends State<HoldTab> {
                               ),
                               builder: (context, snapshot) {
                                 return Text(
-                                  JsonHelper.formatWaitTime(item.createAt),
+                                  JsonHelper.formatWaitTime(item.createAt!),
                                   style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
@@ -131,7 +130,7 @@ class _HoldTabState extends State<HoldTab> {
                                 item,
                                 queue.serviceList,
                               ),
-                              "3",
+                              "3"
                             );
                           },
                           style: ElevatedButton.styleFrom(
@@ -161,7 +160,6 @@ class _HoldTabState extends State<HoldTab> {
                             );
 
                             await context.read<ProviderQueue>().callQueue(
-                              context: context,
                               service: service,
                             );
                           },

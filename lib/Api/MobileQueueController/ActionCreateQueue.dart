@@ -1,23 +1,20 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:print_bluetooth_thermal/print_bluetooth_thermal.dart';
 import '../../Class/ClassSocket.dart';
+import '../../Class/ClassTicket.dart';
+import '../../Class/ClassToast.dart';
 import '../../Models/ModelsServiceQueueBinding.dart';
 import '../ApiConfig.dart';
 
 class ActionCreateQueue {
-  final BuildContext context;
   final int pax;
   final ModelsServiceQueueBinding serviceDetail;
 
-  ActionCreateQueue({
-    required this.context,
-    required this.pax,
-    required this.serviceDetail,
-  });
+  ActionCreateQueue({required this.pax, required this.serviceDetail});
 
   Future<void> CreateQueue() async {
-    final uri = Uri.parse(ApiConfig.createQueue(context),);
+    final uri = Uri.parse(ApiConfig.createQueue);
 
     final body = {
       'Pax': pax,
@@ -33,11 +30,10 @@ class ActionCreateQueue {
     };
 
     try {
+
       final response = await http.post(
         uri,
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: {'Content-Type': 'application/json'},
         body: jsonEncode(body),
       );
 
@@ -51,9 +47,17 @@ class ActionCreateQueue {
         throw Exception(json['message'] ?? 'Create queue error');
       }
 
+      bool status = await PrintBluetoothThermal.connectionStatus;
+      ClassToast.success("กำลังออกบัตรคิว");
+      if (status) {
+        final ticket = await Classticket().printQueueTicket(json);
+        await PrintBluetoothThermal.writeBytes(ticket);
+      }
     } catch (e) {
       print('ActionCreateQueue error: $e');
       rethrow;
     }
   }
 }
+
+

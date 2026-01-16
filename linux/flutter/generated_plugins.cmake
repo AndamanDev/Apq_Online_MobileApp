@@ -3,6 +3,8 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  charset_converter
+  rive_native
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

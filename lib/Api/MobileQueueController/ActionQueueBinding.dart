@@ -5,11 +5,10 @@ import '../../Models/ModelsQueueBinding.dart';
 import '../ApiConfig.dart';
 
 Future<List<ModelsQueueBinding>> ActionQueueBinding({
-  required BuildContext context,
   required int branchId,
   required int type,
 }) async {
-  final uri = Uri.parse(ApiConfig.queueBinding(context),)
+  final uri = Uri.parse(ApiConfig.queueBinding)
       .replace(
         queryParameters: {'bid': branchId.toString(), 'type': type.toString()},
       );
@@ -36,6 +35,7 @@ Future<List<ModelsQueueBinding>> ActionQueueBinding({
     } else {
       return [];
     }
+    
     return list.map((e) => ModelsQueueBinding.fromJson(e)).toList();
   } catch (e) {
     print('QueueBinding error: $e');

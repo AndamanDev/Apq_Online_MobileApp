@@ -5,11 +5,10 @@ import '../../Models/ModelsServiceQueueBinding.dart';
 import '../ApiConfig.dart';
 
 Future<List<ModelsServiceQueueBinding>> ActionServiceQueueBinding({
-  required BuildContext context,
   required int branchId,
 }) async {
   final uri = Uri.parse(
-    ApiConfig.servicequeueBinding(context),
+    ApiConfig.serviceBinding,
   ).replace(queryParameters: {'bid': branchId.toString()});
 
   try {

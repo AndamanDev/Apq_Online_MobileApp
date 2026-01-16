@@ -1,5 +1,4 @@
 import 'package:apq_m1/Class/ClassObject.dart';
-import 'package:apq_m1/Models/ModelsQueueBinding.dart';
 import 'package:apq_m1/Models/ModelsServiceQueueBinding.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -24,9 +23,16 @@ class ClassOthersDialog {
     ModelsServiceQueueBinding item,
     String statustabs,
   ) {
-    final filteredReasons = (statustabs == "3")
-        ? reasons.where((r) => r['reason_id'] != 0).toList()
-        : reasons;
+    final filteredReasons = reasons.where((r) {
+      if (statustabs.isEmpty || statustabs == "1") {
+        return true;
+      }
+      if ((statustabs == "2" || statustabs == "3") && r['reason_id'] == 0) {
+        return false;
+      }
+
+      return true;
+    }).toList();
 
     return showDialog<Map<String, dynamic>>(
       context: context,
@@ -43,7 +49,11 @@ class ClassOthersDialog {
               ),
               const SizedBox(height: 5),
               Text(
-                "${item.callerQueueNo}",
+                "${item.queueNo}",
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+                     Text(
+                "${item.callerId}",
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
@@ -59,7 +69,6 @@ class ClassOthersDialog {
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.of(context, rootNavigator: true).pop(reason);
-
                         if (reasonId == 0) {
                           context.read<ProviderQueue>().updateQueue(
                             service: item,
@@ -72,8 +81,8 @@ class ClassOthersDialog {
                               : 'Ending';
                           context.read<ProviderQueue>().updateQueue(
                             service: item,
-                            statusQueue: ReasonNote,
                             statusQueueNote: reasonId.toString(),
+                            statusQueue: ReasonNote,
                           );
                         }
                       },

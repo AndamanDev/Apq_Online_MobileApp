@@ -4,9 +4,7 @@ import 'package:apq_m1/Provider/ProviderQueue.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../Class/ClassOthersDialog.dart';
-import '../../Class/ClassSocket.dart';
 import '../../Widgets/WidgetNumpad.dart';
-import '../../Models/ModelsQueueBinding.dart';
 
 class CallTab extends StatelessWidget {
   const CallTab({super.key});
@@ -16,90 +14,34 @@ class CallTab extends StatelessWidget {
     final queue = context.watch<ProviderQueue>();
 
     final serviceList = queue.serviceList;
-    final callingQueueList = queue.callingQueueList;
-
-    if (queue.loading) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (serviceList.isEmpty) {
-      return const Center(child: Text('ไม่มีข้อมูลงานบริการ'));
-    }
 
     return ListView.builder(
+      padding: const EdgeInsets.only(bottom: 16),
       itemCount: serviceList.length,
       itemBuilder: (context, index) {
         final item = serviceList[index];
-
-        final currentQueues = callingQueueList
-            .where((q) => q.serviceId == item.serviceId)
-            .toList();
-
-        final ModelsQueueBinding? currentQueue = currentQueues.isNotEmpty
-            ? currentQueues.last
-            : null;
-
-        final bool isCurrentQueueMatch = currentQueue != null;
+        final bool isCurrentQueueMatch =
+            item.callerQueueNo != null && item.callerQueueNo!.trim().isNotEmpty;
 
         return Card(
-          margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+          margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
           child: Padding(
-            padding: const EdgeInsets.all(5.0),
+            padding: const EdgeInsets.all(8),
             child: Column(
               children: [
+                /// ===== TOP INFO =====
                 Row(
                   children: [
-                    /// Service
-                    Expanded(
-                      child: Column(
-                        children: [
-                          const Text(
-                            'Service',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            item.serviceGroupName ?? "-",
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
+                    _info('Service', item.serviceGroupName ?? '-'),
+                    _info('Waiting', '${item.qWait ?? 0}'),
+                    _info(
+                      'Next',
+                      item.nextQueueNo != ''
+                          ? '${item.nextQueueNo}(${item.nextQueueNoNumberPax})'
+                          : '-',
                     ),
 
-                    /// Waiting
-                    Expanded(
-                      child: Column(
-                        children: [
-                          const Text(
-                            'Waiting',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            '${item.qWait ?? 0}',
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    /// Next
-                    Expanded(
-                      child: Column(
-                        children: [
-                          const Text(
-                            'Next',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          Text(
-                            item.nextQueueNo != ''
-                                ? '${item.nextQueueNo}(${item.nextQueueNoNumberPax})'
-                                : "-",
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    /// Current Queue
+                    /// CURRENT QUEUE
                     Expanded(
                       flex: 2,
                       child: Container(
@@ -115,11 +57,12 @@ class CallTab extends StatelessWidget {
                           ),
                         ),
                         child: Text(
-                          currentQueue?.queueNo ?? '',
+                          item.callerQueueNo ?? '',
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             color: AppColors.primary,
                             fontWeight: FontWeight.bold,
+                            fontSize: 16,
                           ),
                         ),
                       ),
@@ -127,86 +70,51 @@ class CallTab extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: 6),
+                const SizedBox(height: 8),
 
+                /// ===== ACTION BUTTONS =====
                 Row(
                   children: [
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () => _showAddQueueNumpad(context, item),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          disabledBackgroundColor: Colors.grey,
-                          foregroundColor: Colors.white,
-                        ),
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: const Text("ADD Q"),
-                        ),
-                      ),
+                    _btn(
+                      label: 'ADD Q',
+                      color: AppColors.primary,
+                      onPressed: () => _showAddQueueNumpad(context, item),
                     ),
-                    const SizedBox(width: 5),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: isCurrentQueueMatch
-                            ? () async {
-                                await context.read<ProviderQueue>().updateQueue(
-                                  service: item,
-                                  statusQueue: 'Finishing',
-                                  statusQueueNote: '1',
-                                );
-                              }
-                            : null,
-
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.green,
-                          disabledBackgroundColor: Colors.grey,
-                          foregroundColor: Colors.white,
-                        ),
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: const Text("ARRIVED"),
-                        ),
-                      ),
+                    _gap(),
+                    _btn(
+                      label: 'ARRIVED',
+                      color: AppColors.green,
+                      onPressed: isCurrentQueueMatch
+                          ? () => context.read<ProviderQueue>().updateQueue(
+                              service: item,
+                              statusQueue: 'Finishing',
+                              statusQueueNote: '1',
+                            )
+                          : null,
                     ),
-                    const SizedBox(width: 5),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: isCurrentQueueMatch
-                            ? () => ClassOthersDialog.show(context, item , "2")
-                            : null,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.orange,
-                          disabledBackgroundColor: Colors.grey,
-                          foregroundColor: Colors.white,
-                        ),
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: const Text("OTHERS"),
-                        ),
-                      ),
+                    _gap(),
+                    _btn(
+                      label: 'OTHERS',
+                      color: AppColors.orange,
+                      onPressed: isCurrentQueueMatch
+                          ? () => ClassOthersDialog.show(context, item, "1")
+                          : null,
                     ),
-                    const SizedBox(width: 5),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          isCurrentQueueMatch
-                              ? ClassSocket().recallQueue(currentQueue)
-                              : await context.read<ProviderQueue>().callQueue(
-                                  context: context,
-                                  service: item,
-                                );
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          disabledBackgroundColor: Colors.white,
-                          foregroundColor: Colors.white,
-                        ),
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
-                          child: Text(isCurrentQueueMatch ? "RECALL" : "CALL"),
-                        ),
-                      ),
+                    _gap(),
+                    _btn(
+                      label: isCurrentQueueMatch ? 'RECALL' : 'CALL',
+                      color: AppColors.primary,
+                      onPressed: () async {
+                        isCurrentQueueMatch
+                            ? await context.read<ProviderQueue>().updateQueue(
+                                service: item,
+                                statusQueue: 'Recalling',
+                                statusQueueNote: '',
+                              )
+                            : await context.read<ProviderQueue>().callQueue(
+                                service: item,
+                              );
+                      },
                     ),
                   ],
                 ),
@@ -218,11 +126,47 @@ class CallTab extends StatelessWidget {
     );
   }
 
+  /// ===== helper widgets =====
+
+  Widget _info(String title, String value) {
+    return Expanded(
+      child: Column(
+        children: [
+          Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+          Text(value),
+        ],
+      ),
+    );
+  }
+
+  Widget _btn({
+    required String label,
+    required Color color,
+    VoidCallback? onPressed,
+  }) {
+    return Expanded(
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          disabledBackgroundColor: Colors.grey,
+          foregroundColor: Colors.white,
+          padding: const EdgeInsets.symmetric(vertical: 12),
+        ),
+        child: FittedBox(child: Text(label)),
+      ),
+    );
+  }
+
+  Widget _gap() => const SizedBox(width: 6);
+
+  /// ===== ADD QUEUE =====
+
   void _showAddQueueNumpad(
     BuildContext parentContext,
     ModelsServiceQueueBinding item,
   ) {
-    final TextEditingController controller = TextEditingController();
+    final controller = TextEditingController();
 
     showModalBottomSheet(
       context: parentContext,
@@ -240,7 +184,7 @@ class CallTab extends StatelessWidget {
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 12),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     child: TextField(
@@ -257,15 +201,10 @@ class CallTab extends StatelessWidget {
                       ),
                     ),
                   ),
-
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 12),
                   Widgetnumpad(
                     currentValue: controller.text,
-                    onNumberTap: (value) {
-                      setState(() {
-                        controller.text += value;
-                      });
-                    },
+                    onNumberTap: (v) => setState(() => controller.text += v),
                     onDelete: () {
                       setState(() {
                         if (controller.text.isNotEmpty) {
@@ -276,19 +215,15 @@ class CallTab extends StatelessWidget {
                         }
                       });
                     },
-                    onClear: () {
-                      setState(() {
-                        controller.clear();
-                      });
-                    },
+                    onClear: () => setState(controller.clear),
                     onSubmit: () async {
                       if (controller.text.isEmpty) return;
 
-                      final int pax = int.parse(controller.text);
+                      final pax = int.parse(controller.text);
                       Navigator.pop(context);
 
                       await parentContext.read<ProviderQueue>().createQueue(
-                        context: context,
+                        // context: context,
                         pax: pax,
                         service: item,
                       );

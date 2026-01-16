@@ -146,4 +146,60 @@ class ModelsServiceQueueBinding {
       isInCaller: true,
     );
   }
+
+  ModelsServiceQueueBinding copyWith({
+  String? branchName,
+  int? tKioskId,
+  int? branchId,
+  String? tKioskName,
+  int? tKioskDetailId,
+  int? branchServiceGroupId,
+  int? tKioskBtnSeq,
+  String? tKioskBtnName,
+  int? serviceId,
+  int? serviceGroupId,
+  String? serviceGroupName,
+  int? prefixId,
+  String? prefixCode,
+  int? branchServiceId,
+  int? queueId,
+  String? queueNo,
+  String? queueDate,
+  int? qWait,
+  String? nextQueueNo,
+  int? nextQueueNoNumberPax,
+  int? callerQueueId,
+  int? callerId,
+  String? callerQueueNo,
+  bool? isInCaller, required int callerQueueNoNumberPax,
+}) {
+  return ModelsServiceQueueBinding(
+    branchName: branchName ?? this.branchName,
+    tKioskId: tKioskId ?? this.tKioskId,
+    branchId: branchId ?? this.branchId,
+    tKioskName: tKioskName ?? this.tKioskName,
+    tKioskDetailId: tKioskDetailId ?? this.tKioskDetailId,
+    branchServiceGroupId:
+        branchServiceGroupId ?? this.branchServiceGroupId,
+    tKioskBtnSeq: tKioskBtnSeq ?? this.tKioskBtnSeq,
+    tKioskBtnName: tKioskBtnName ?? this.tKioskBtnName,
+    serviceId: serviceId ?? this.serviceId,
+    serviceGroupId: serviceGroupId ?? this.serviceGroupId,
+    serviceGroupName: serviceGroupName ?? this.serviceGroupName,
+    prefixId: prefixId ?? this.prefixId,
+    prefixCode: prefixCode ?? this.prefixCode,
+    branchServiceId: branchServiceId ?? this.branchServiceId,
+    queueId: queueId ?? this.queueId,
+    queueNo: queueNo ?? this.queueNo,
+    queueDate: queueDate ?? this.queueDate,
+    qWait: qWait ?? this.qWait,
+    nextQueueNo: nextQueueNo ?? this.nextQueueNo,
+    nextQueueNoNumberPax:
+        nextQueueNoNumberPax ?? this.nextQueueNoNumberPax,
+    callerQueueId: callerQueueId ?? this.callerQueueId,
+    callerId: callerId ?? this.callerId,
+    callerQueueNo: callerQueueNo ?? this.callerQueueNo,
+    isInCaller: isInCaller ?? this.isInCaller,
+  );
+}
 }

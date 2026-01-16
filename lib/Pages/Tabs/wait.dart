@@ -68,7 +68,6 @@ class _WaitTabState extends State<WaitTab> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      /// Queue No
                       Text(
                         item.queueNo.toString(),
                         style: const TextStyle(
@@ -99,7 +98,7 @@ class _WaitTabState extends State<WaitTab> {
                               ),
                               builder: (context, snapshot) {
                                 return Text(
-                                  JsonHelper.formatWaitTime(item.createAt),
+                                  JsonHelper.formatWaitTime(item.createAt!),
                                   style: const TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w600,
@@ -161,7 +160,6 @@ class _WaitTabState extends State<WaitTab> {
                             );
 
                             await context.read<ProviderQueue>().callQueue(
-                              context: context,
                               service: service,
                             );
                           },

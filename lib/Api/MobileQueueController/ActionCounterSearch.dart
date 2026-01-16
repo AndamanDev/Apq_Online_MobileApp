@@ -5,11 +5,10 @@ import '../ApiConfig.dart';
 import 'package:flutter/material.dart';
 
 Future<List<Modelscountersearch>> ActionCounterSearch({
-  required BuildContext context,
   required dynamic branchid,
 }) async {
   final uri = Uri.parse(
-   ApiConfig.counterSearch(context),
+   ApiConfig.counterSearch,
   ).replace(queryParameters: {
     'bid': branchid.toString(),
   });

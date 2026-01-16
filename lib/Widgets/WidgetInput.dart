@@ -7,6 +7,7 @@ class WidgetinputTemplate extends StatelessWidget {
   final String hint;
   final IconData icon;
   final bool obscureText;
+  final IconButton? suffixIcon;
 
   const WidgetinputTemplate({
     super.key,
@@ -14,6 +15,7 @@ class WidgetinputTemplate extends StatelessWidget {
     required this.hint,
     required this.icon,
     this.obscureText = false,
+    this.suffixIcon,
   });
 
   @override
@@ -26,6 +28,7 @@ class WidgetinputTemplate extends StatelessWidget {
         hintText: hint,
         hintStyle: AppTextStyles.hint,
         prefixIcon: Icon(icon, color: AppColors.primary),
+        suffixIcon: suffixIcon,
         filled: true,
         fillColor: AppColors.white,
         contentPadding: const EdgeInsets.symmetric(

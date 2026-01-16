@@ -2,6 +2,7 @@ import 'package:apq_m1/Widgets/WidgetInput.dart';
 import 'package:apq_m1/Widgets/WidgetsLogin.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../Class/ClassDialog.dart';
 import '../Class/ClassObject.dart';
 import '../Database/DatabaseAuth.dart';
 import '../Models/ModelsAuth.dart';
@@ -20,60 +21,85 @@ class _LoginPageState extends State<LoginPage> {
   final usernameController = TextEditingController();
   final passwordController = TextEditingController();
   final domainController = TextEditingController();
+  bool _obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
-    return WidgetsloginTemplate(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          /// LOGO
-          const Text('Logo', style: AppTextStyles.logo),
-          const SizedBox(height: 40),
-
-          /// DOMAIN
-          WidgetinputTemplate(
-            controller: domainController,
-            hint: 'Domain',
-            icon: Icons.language_outlined,
-          ),
-          const SizedBox(height: 16),
-
-          /// USERNAME
-          WidgetinputTemplate(
-            controller: usernameController,
-            hint: 'Username',
-            icon: Icons.person_outline,
-          ),
-          const SizedBox(height: 16),
-
-          /// PASSWORD
-          WidgetinputTemplate(
-            controller: passwordController,
-            hint: 'Password',
-            icon: Icons.lock_outline,
-            obscureText: true,
-          ),
-          const SizedBox(height: 24),
-          SizedBox(
-            width: double.infinity,
-            height: 54,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: AppColors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(32),
-                  side: const BorderSide(color: AppColors.white, width: 2),
-                ),
-                elevation: 0,
+    return Stack(
+      children: [
+        WidgetsloginTemplate(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Image.asset('assets/logo/apqueue_logo2.png', fit: BoxFit.contain),
+              const SizedBox(height: 40),
+              WidgetinputTemplate(
+                controller: domainController,
+                hint: 'Domain',
+                icon: Icons.language_outlined,
+                suffixIcon: null,
               ),
-              onPressed: _onLogin,
-              child: const Text('Log in', style: AppTextStyles.button),
+              const SizedBox(height: 16),
+              WidgetinputTemplate(
+                controller: usernameController,
+                hint: 'Username',
+                icon: Icons.person_outline,
+                suffixIcon: null,
+              ),
+              const SizedBox(height: 16),
+              WidgetinputTemplate(
+                controller: passwordController,
+                hint: 'Password',
+                icon: Icons.lock_outline,
+                obscureText: _obscurePassword,
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                    color: Colors.grey,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _obscurePassword = !_obscurePassword;
+                    });
+                  },
+                ),
+              ),
+
+              const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                height: 54,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: AppColors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(32),
+                      side: const BorderSide(color: AppColors.white, width: 2),
+                    ),
+                    elevation: 0,
+                  ),
+                  onPressed: _onLogin,
+                  child: const Text('Log in', style: AppTextStyles.button),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        const Positioned(
+          bottom: 12,
+          right: 30,
+          child: Text(
+            'Version 13.01.26',
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.white,
+              decoration: TextDecoration.none,
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -83,37 +109,49 @@ class _LoginPageState extends State<LoginPage> {
     final domain = domainController.text.trim();
 
     if (username.isEmpty || password.isEmpty || domain.isEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('กรุณากรอกข้อมูลให้ครบ')));
+      await ClassDialog.error(context, 'กรุณากรอกข้อมูลให้ครบ');
       return;
     }
 
-    final result = await ActionLogin(
-      domain: domain,
-      username: username,
-      password: password,
-    );
-
-    if (result.success) {
-      final auth = Modelsauth(
+    try {
+      final result = await ActionLogin(
         domain: domain,
         username: username,
-        data: result.data['data'],
+        password: password,
       );
-
-      await Databaseauth.saveAuth(auth);
-      await context.read<ProviderAuth>().loadFromDb();
 
       if (!mounted) return;
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const InitPage()),
-        (route) => false,
-      );
-    } else {
-      ScaffoldMessenger.of(
+
+      if (result.success) {
+        final auth = Modelsauth(
+          domain: domain,
+          username: username,
+          data: result.data['data'],
+          node: '/nodeapq/socket.io',
+        );
+
+        await Databaseauth.saveAuth(auth);
+        await context.read<ProviderAuth>().loadFromDb();
+
+        if (!mounted) return;
+
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const InitPage()),
+          (route) => false,
+        );
+      } else {
+        // await ClassDialog.error(context, result.message == 'OS Error: No addess' ?? 'Login failed');
+        final msg = result.message?.contains('addess') == true
+            ? 'Domain ผิด หรือ ป้อนรหัสผิด'
+            : 'Domain ผิด หรือ ป้อนรหัสผิด';
+        await ClassDialog.error(context, msg);
+      }
+    } catch (e) {
+      if (!mounted) return;
+      await ClassDialog.error(
         context,
-      ).showSnackBar(SnackBar(content: Text(result.message ?? 'Login failed')));
+        'ไม่สามารถเข้าสู่ระบบได้\n${e.toString()}',
+      );
     }
   }
 }

@@ -2,27 +2,45 @@ import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:toastification/toastification.dart';
 import 'Class/ClassObject.dart';
+import 'Class/ClassPrinterService.dart';
+import 'Class/Global.dart';
 import 'Pages/InitPage.dart';
 import 'Provider/ProviderAuth.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-    await _requestPermissions();
+
+  await _requestPermissions();
+  await Classprinterservice.instance.init();
+
   final authProvider = ProviderAuth();
-  await authProvider.loadFromDb(); 
+  await authProvider.loadFromDb();
+
+  // runApp(
+  //   ToastificationWrapper(
+  //     child: MultiProvider(
+  //       providers: [
+  //         ChangeNotifierProvider(create: (_) => authProvider),
+  //       ],
+  //       child: DevicePreview(
+  //         enabled: !kReleaseMode,
+  //         builder: (context) => const MyApp(),
+  //       ),
+  //     ),
+  //   ),
+  // );
   runApp(
-     MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => authProvider),
-      ],
-      child:  DevicePreview(enabled: !kReleaseMode, builder: (context) => const MyApp()),
+    ToastificationWrapper(
+      child: MultiProvider(
+        providers: [ChangeNotifierProvider(create: (_) => authProvider)],
+        child: const MyApp(),
+      ),
     ),
-   
   );
 }
-
 
 Future<void> _requestPermissions() async {
   final statuses = await [
@@ -65,7 +83,7 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: AppColors.background,
         primaryColor: AppColors.primary,
       ),
-
+      scaffoldMessengerKey: rootMessengerKey,
       home: const InitPage(),
     );
   }

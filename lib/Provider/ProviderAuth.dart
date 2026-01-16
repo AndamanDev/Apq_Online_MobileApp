@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../Api/ApiConfig.dart';
 import '../Database/DatabaseAuth.dart';
 import '../Models/ModelsAuth.dart';
 
@@ -15,12 +16,16 @@ class ProviderAuth extends ChangeNotifier {
 
   Future<void> loadFromDb() async {
     _auth = await Databaseauth.getAuth();
+    if (_auth != null) {
+      ApiConfig.domain = _auth!.domain!;
+    }
     _isLoading = false;
     notifyListeners();
   }
 
   Future<void> setAuth(Modelsauth auth) async {
     _auth = auth;
+    ApiConfig.domain = auth.domain!;
     await Databaseauth.saveAuth(auth);
     notifyListeners();
   }

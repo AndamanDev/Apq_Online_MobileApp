@@ -5,6 +5,12 @@ import 'package:path/path.dart';
 class Databaseauth {
   static Database? _db;
 
+  static Future<List<Map<String, dynamic>>> getAllAuth() async {
+    final db = await database;
+    final result = await db.query('auth');
+    return result;
+  }
+
   static Future<Database> get database async {
     if (_db != null) return _db!;
     _db = await _initDB();
@@ -22,7 +28,8 @@ class Databaseauth {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             domain TEXT,
             username TEXT,
-            data TEXT
+            data TEXT,
+            node Text
           )
         ''');
       },
@@ -44,7 +51,8 @@ class Databaseauth {
     return Modelsauth(
       domain: result.first['domain'] as String,
       username: result.first['username'] as String,
-      data: result.first['data'] as dynamic
+      data: result.first['data'] as dynamic,
+      node: result.first['node'] as String? ?? '',
     );
   }
 
